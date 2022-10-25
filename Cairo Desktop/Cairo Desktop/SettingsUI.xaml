@@ -845,6 +845,19 @@
                     <TextBlock Text="{Binding Path=(l10n:DisplayString.sSettings_Appearance)}"
                                Style="{StaticResource SettingGroupHeader}" />
                     <StackPanel Orientation="Horizontal">
+                      <TextBlock Text="{Binding Path=(l10n:DisplayString.sSettings_General_TimeFormat)}" />
+                      <TextBox Name="primaryScreenSetting"
+                               ToolTip="{Binding Path=(l10n:DisplayString.sSettings_General_TimeFormatTooltip)}">
+                        <TextBox.Text>
+                          <Binding Path="PrimaryMonitor"
+                                                   Source="{x:Static Settings:Settings.Instance}"
+                                                   UpdateSourceTrigger="PropertyChanged">
+
+                          </Binding>
+                        </TextBox.Text>
+                      </TextBox>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
                         <TextBlock Text="{Binding Path=(l10n:DisplayString.sSettings_General_TimeFormat)}" />
                         <TextBox Name="timeSetting"
                                  ToolTip="{Binding Path=(l10n:DisplayString.sSettings_General_TimeFormatTooltip)}">

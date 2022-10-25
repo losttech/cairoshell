@@ -557,6 +557,22 @@ namespace CairoDesktop.Configuration
                 }
             }
         }
+
+        public MonitorPreference TaskbarMonitor
+        {
+            get
+            {
+                return MonitorPreference.Parse(cairoSettings.TaskbarMonitor);
+            }
+            set
+            {
+                string newVal = value.ToString();
+                if (cairoSettings.TaskbarMonitor != newVal)
+                {
+                    cairoSettings.TaskbarMonitor = newVal;
+                }
+            }
+        }
         #endregion
 
         #region Menu Bar
@@ -696,6 +712,22 @@ namespace CairoDesktop.Configuration
             }
         }
 
+        public MonitorPreference MenuBarMonitor
+        {
+            get
+            {
+                return MonitorPreference.Parse(cairoSettings.MenuBarMonitor);
+            }
+            set
+            {
+                string newVal = value.ToString();
+                if (cairoSettings.MenuBarMonitor != newVal)
+                {
+                    cairoSettings.MenuBarMonitor = newVal;
+                }
+            }
+        }
+
         public bool ShowHibernate
         {
             get
@@ -804,6 +836,11 @@ namespace CairoDesktop.Configuration
         #endregion
 
         #region Advanced
+        public string PrimaryMonitor
+        {
+            get => cairoSettings.TaskbarMonitor;
+            set => cairoSettings.TaskbarMonitor = cairoSettings.MenuBarMonitor = value;
+        }
         public string TimeFormat
         {
             get
