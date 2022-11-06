@@ -14,6 +14,7 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.IO;
 using CairoDesktop.Interfaces;
+using Gma.System.MouseKeyHook;
 
 namespace CairoDesktop
 {
@@ -65,6 +66,9 @@ namespace CairoDesktop
                     services.AddSingleton<IWindowManager, WindowManager>();
                     services.AddSingleton<IWindowService, MenuBarWindowService>();
                     services.AddSingleton<IWindowService, TaskbarWindowService>();
+                    services.AddSingleton<ICombinedTaskbarItemService, CombinedTaskbarItemService>();
+                    var globalInputHook = Hook.GlobalEvents();
+                    services.AddSingleton<IKeyboardEvents>(globalInputHook);
 
 #if ENABLEFIRSTRUN
                     services.AddHostedService<FirstRunService>();

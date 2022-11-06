@@ -58,7 +58,8 @@ namespace CairoDesktop
             ShellManager shellManager, 
             IWindowManager windowManager, 
             IDesktopManager desktopManager,
-            IAppGrabber appGrabber, 
+            IAppGrabber appGrabber,
+            ICombinedTaskbarItemService itemService,
             AppBarScreen screen, 
             AppBarEdge edge) 
             : base(cairoApplication, shellManager, windowManager, screen, edge, 0)
@@ -81,12 +82,12 @@ namespace CairoDesktop
                 ProcessScreenChanges = false;
             }
 
-            setupTaskbar();
+            setupTaskbar(itemService);
             setupTaskbarAppearance();
         }
 
         #region Startup and shutdown
-        private void setupTaskbar()
+        private void setupTaskbar(ICombinedTaskbarItemService itemService)
         {
             // setup app bar settings
             if (Settings.Instance.TaskbarMode != 0)
@@ -116,6 +117,15 @@ namespace CairoDesktop
             TasksList.ItemsSource = _taskbarItems;
             TasksList2.ItemsSource = _shellManager.Tasks.GroupedWindows;
             if (_shellManager.Tasks.GroupedWindows != null) _shellManager.Tasks.GroupedWindows.CollectionChanged += GroupedWindows_Changed;
+
+            var combinedItems = new CompositeCollection
+            {
+                new CollectionContainer{ Collection = itemService.Pinned },
+                new CollectionContainer{ Collection = itemService.Unpinned },
+            };
+            var combinedTasksView = new CollectionViewSource { Source = combinedItems }.View;
+            CombinedTasks.ItemsSource = combinedTasksView;
+            CombinedTasksDebug.ItemsSource = combinedTasksView;
 
             // setup data contexts
             bdrMain.DataContext = Settings.Instance;

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.InteropServices;
 using System.Windows.Input;
 using ManagedShell.Common;
 using static ManagedShell.Interop.NativeMethods;
@@ -42,9 +43,16 @@ namespace CairoDesktop.Common
             {
                 HotKeyManager.HotKeys.Add(Id, this);
             }
+            else
+            {
+                var error = new System.ComponentModel.Win32Exception();
+            }
 
             return _registered;
         }
+
+        [DllImport("user32", SetLastError = true)]
+        static extern bool RegisterHotKey(IntPtr hWnd, int id, uint fsModifiers, uint vlc);
 
         public void Unregister()
         {
@@ -63,5 +71,12 @@ namespace CairoDesktop.Common
         {
             Unregister();
         }
+
+        public static ModifierKeys GetKeyboardModifiers()
+            => Keyboard.Modifiers | (IsWinDown() ? ModifierKeys.Windows : ModifierKeys.None);
+
+        static bool IsWinDown() => Keyboard.IsKeyDown(Key.LWin) || Keyboard.IsKeyDown(Key.RWin);
+
+        public override string ToString() => Key.ToString();
     }
 }

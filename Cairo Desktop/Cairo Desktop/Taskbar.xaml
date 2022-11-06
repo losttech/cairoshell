@@ -261,6 +261,7 @@
                                   Margin="0,0,5,0"
                                   Drop="quickLaunchList_Drop"
                                   DragEnter="quickLaunchList_DragEnter"
+                                  Visibility="Collapsed"
                                   SizeChanged="quickLaunchList_SizeChanged">
                             <ListView.ItemsPanel>
                                 <ItemsPanelTemplate>
@@ -386,6 +387,7 @@
                         </Popup>
                         <ListView HorizontalAlignment="Stretch"
                                   Style="{StaticResource TaskbarListView}"
+                                  Visibility="Collapsed"
                                   x:Name="TasksList">
                             <ListView.ItemsPanel>
                                 <ItemsPanelTemplate>
@@ -395,6 +397,115 @@
                             </ListView.ItemsPanel>
                             <ListView.GroupStyle>
                                 <GroupStyle x:Name="TaskbarGroupStyle">
+                                    <GroupStyle.Panel>
+                                        <ItemsPanelTemplate>
+                                            <StackPanel Orientation="Horizontal" />
+                                        </ItemsPanelTemplate>
+                                    </GroupStyle.Panel>
+                                    <GroupStyle.ContainerStyle>
+                                        <Style TargetType="{x:Type GroupItem}">
+                                            <Setter Property="Template">
+                                                <Setter.Value>
+                                                    <ControlTemplate TargetType="GroupItem">
+                                                        <ContentControl Style="{StaticResource TaskbarGroup}">
+                                                            <Border BorderThickness="0"
+                                                                    Margin="0,0,-1,0"
+                                                                    Width="{Binding Path=ButtonWidth, ElementName=TaskbarWindow}">
+                                                                <self:TaskButton ListMode="False"
+                                                                                 ParentTaskbar="{Binding ElementName=TaskbarWindow}" />
+                                                                <Border.Triggers>
+                                                                    <EventTrigger RoutedEvent="Loaded">
+                                                                        <BeginStoryboard>
+                                                                            <Storyboard>
+                                                                                <DoubleAnimation Storyboard.TargetProperty="Width"
+                                                                                                  From="0"
+                                                                                                  To="{Binding Path=ButtonWidth, ElementName=TaskbarWindow}"
+                                                                                                  Duration="0:0:0.2"
+                                                                                                  FillBehavior="Stop">
+                                                                                    <DoubleAnimation.EasingFunction>
+                                                                                        <QuadraticEase EasingMode="EaseInOut" />
+                                                                                    </DoubleAnimation.EasingFunction>
+                                                                                </DoubleAnimation>
+                                                                            </Storyboard>
+                                                                        </BeginStoryboard>
+                                                                    </EventTrigger>
+                                                                </Border.Triggers>
+                                                            </Border>
+                                                        </ContentControl>
+                                                    </ControlTemplate>
+                                                </Setter.Value>
+                                            </Setter>
+                                        </Style>
+                                    </GroupStyle.ContainerStyle>
+                                </GroupStyle>
+                            </ListView.GroupStyle>
+                            <ListView.ItemContainerStyle>
+                                <Style TargetType="{x:Type ListViewItem}">
+                                    <Setter Property="Background" Value="Transparent" />
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="{x:Type ListViewItem}">
+                                                <Border BorderThickness="0" Margin="0,0,-1,0" BorderBrush="Transparent"
+                                                        Width="{Binding Path=ButtonWidth, ElementName=TaskbarWindow}">
+                                                    <self:TaskButton ListMode="False"
+                                                                     MouseRightButtonUp="TaskButton_MouseRightButtonUp"
+                                                                     ParentTaskbar="{Binding ElementName=TaskbarWindow}" />
+                                                    <Border.Style>
+                                                        <Style TargetType="{x:Type Border}">
+                                                            <Setter Property="Visibility" Value="Collapsed" />
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding Path=ShowInTaskbar}"
+                                                                             Value="True">
+                                                                    <Setter Property="Visibility" Value="Visible" />
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </Border.Style>
+                                                    <Border.Triggers>
+                                                        <EventTrigger RoutedEvent="Loaded">
+                                                            <BeginStoryboard>
+                                                                <Storyboard>
+                                                                    <DoubleAnimation Storyboard.TargetProperty="Width"
+                                                                                     From="0"
+                                                                                     To="{Binding Path=ButtonWidth, ElementName=TaskbarWindow}"
+                                                                                     Duration="0:0:0.2"
+                                                                                     FillBehavior="Stop">
+                                                                        <DoubleAnimation.EasingFunction>
+                                                                            <QuadraticEase EasingMode="EaseInOut" />
+                                                                        </DoubleAnimation.EasingFunction>
+                                                                    </DoubleAnimation>
+                                                                </Storyboard>
+                                                            </BeginStoryboard>
+                                                        </EventTrigger>
+                                                    </Border.Triggers>
+                                                </Border>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Style>
+                            </ListView.ItemContainerStyle>
+                        </ListView>
+                        <ListView HorizontalAlignment="Stretch"
+                                  Visibility="Collapsed"
+                                  x:Name="CombinedTasksDebug">
+                            <ListView.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <StackPanel Orientation="Horizontal"
+                                                Margin="0" />
+                                </ItemsPanelTemplate>
+                            </ListView.ItemsPanel>
+                        </ListView>
+                        <ListView HorizontalAlignment="Stretch"
+                                  Style="{StaticResource TaskbarListView}"
+                                  x:Name="CombinedTasks">
+                            <ListView.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <StackPanel Orientation="Horizontal"
+                                                Margin="0" />
+                                </ItemsPanelTemplate>
+                            </ListView.ItemsPanel>
+                            <ListView.GroupStyle>
+                                <GroupStyle x:Name="TaskbarCombinedGroupStyle">
                                     <GroupStyle.Panel>
                                         <ItemsPanelTemplate>
                                             <StackPanel Orientation="Horizontal" />

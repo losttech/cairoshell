@@ -5,6 +5,7 @@
              x:Class="CairoDesktop.TaskButton"
              x:Name="UserControl"
              xmlns:support="clr-namespace:CairoDesktop.SupportingClasses" 
+             DataContextChanged="UserControl_DataContextChanged"
              Loaded="UserControl_Loaded"
              Unloaded="TaskButton_OnUnloaded">
     <UserControl.Resources>

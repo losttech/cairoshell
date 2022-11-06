@@ -13,16 +13,19 @@ namespace CairoDesktop.Services
     {
         private readonly IAppGrabber _appGrabber;
         private readonly IDesktopManager _desktopManager;
+        private readonly ICombinedTaskbarItemService _itemService;
 
         public TaskbarWindowService(ICairoApplication cairoApplication,
             ShellManagerService shellManagerService,
             IWindowManager windowManager,
-            IDesktopManager desktopManager, 
+            IDesktopManager desktopManager,
+            ICombinedTaskbarItemService itemService,
             IAppGrabber appGrabber) 
             : base(cairoApplication, shellManagerService, windowManager)
         {
             _appGrabber = appGrabber;
             _desktopManager = desktopManager;
+            _itemService = itemService;
 
             EnableMultiMon = Settings.Instance.EnableTaskbarMultiMon;
             EnableService = Settings.Instance.EnableTaskbar;
@@ -81,7 +84,7 @@ namespace CairoDesktop.Services
 
         protected override void OpenWindow(AppBarScreen screen)
         {
-            Taskbar newTaskbar = new Taskbar(_cairoApplication, _shellManager, _windowManager, _desktopManager, _appGrabber, screen, Settings.Instance.TaskbarPosition == 1 ? AppBarEdge.Top : AppBarEdge.Bottom);
+            Taskbar newTaskbar = new Taskbar(_cairoApplication, _shellManager, _windowManager, _desktopManager, _appGrabber, _itemService, screen, Settings.Instance.TaskbarPosition == 1 ? AppBarEdge.Top : AppBarEdge.Bottom);
             Windows.Add(newTaskbar);
             newTaskbar.Show();
         }

@@ -13,12 +13,14 @@ namespace CairoDesktop.Services
     {
         private readonly ICairoApplication _cairoApplication;
         private readonly IDesktopManager _desktopManager;
+        private readonly ICombinedTaskbarItemService _taskbarService;
 
-        public ShellHotKeyService(ICairoApplication cairoApplication, IDesktopManager desktopManager)
+        public ShellHotKeyService(ICairoApplication cairoApplication, IDesktopManager desktopManager, ICombinedTaskbarItemService taskbarService)
         {
             _cairoApplication = cairoApplication;
             _desktopManager = desktopManager;
-            
+            _taskbarService = taskbarService;
+
             ServiceStartTask = new Task(RegisterSystemHotkeys);
         }
 
@@ -34,15 +36,19 @@ namespace CairoDesktop.Services
                     new HotKey(Key.E, HotKeyModifier.Win | HotKeyModifier.NoRepeat, OnWinECommand);
                     new HotKey(Key.I, HotKeyModifier.Win | HotKeyModifier.NoRepeat, OnWinICommand);
                     new HotKey(Key.Pause, HotKeyModifier.Win | HotKeyModifier.NoRepeat, OnWinPauseCommand);
+
+                    _taskbarService.HookWinN();
                 });
             }
+
+            _cairoApplication.Dispatch(_taskbarService.HookWinN);
         }
 
         private void OnWinDCommand(HotKey obj)
         {
             _desktopManager.ToggleOverlay();
         }
-        
+
         private void OnWinRCommand(HotKey cmd)
         {
             ShellHelper.ShowRunDialog(Localization.DisplayString.sRun_Title, Localization.DisplayString.sRun_Info);

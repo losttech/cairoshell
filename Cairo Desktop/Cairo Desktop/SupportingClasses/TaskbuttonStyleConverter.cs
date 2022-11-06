@@ -29,6 +29,10 @@ namespace CairoDesktop.SupportingClasses
             {
                 fxStyle = fxElement.FindResource("CairoTaskbarButtonActiveStyle");
             }
+            if (winState == ApplicationWindow.WindowState.Hidden)
+            {
+                fxStyle = fxElement.FindResource("CairoQuickLaunchButtonStyle");
+            }
 
             return fxStyle;
         }

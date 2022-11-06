@@ -11,6 +11,7 @@ using ManagedShell.Common.Helpers;
 using ManagedShell.WindowsTasks;
 using System.Collections.ObjectModel;
 using CairoDesktop.SupportingClasses;
+using CairoDesktop.ViewModels;
 
 namespace CairoDesktop
 {
@@ -59,6 +60,15 @@ namespace CairoDesktop
 
         public void SelectWindow()
         {
+            if (WindowGroup == null || WindowGroup.Count < 1)
+            {
+                if (DataContext is CombinedTaskbarItem combinedItem)
+                {
+                    var app = combinedItem.AppInfo;
+                    ParentTaskbar._appGrabber.LaunchProgram(app);
+                }
+            }
+            
             if (_isGroup)
             {
                 openThumb();
@@ -104,19 +114,50 @@ namespace CairoDesktop
         }
 
         #region Events
-        private void UserControl_Loaded(object sender, RoutedEventArgs e)
+        private void UserControl_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
-            if (DataContext is TaskGroup group)
+            if (e.OldValue == e.NewValue) return;
+            if (e.OldValue != null) DetachDataContext(e.OldValue);
+            if (e.NewValue != null) AttachDataContext(e.NewValue);
+        }
+
+        private void AttachDataContext(object dataContext)
+        {
+            if (dataContext is TaskGroup group)
             {
                 WindowGroup = group.Windows;
                 group.PropertyChanged += Data_PropertyChanged;
             }
-            else if (DataContext is ApplicationWindow window)
+            else if (dataContext is ApplicationWindow window)
             {
                 WindowGroup = new ReadOnlyObservableCollection<object>(new ObservableCollection<object>() { window });
                 window.PropertyChanged += Data_PropertyChanged;
             }
+            else if (dataContext is CombinedTaskbarItem combinedItem)
+            {
+                WindowGroup = combinedItem.TaskGroup?.Windows ?? new ReadOnlyObservableCollection<object>(new ObservableCollection<object>());
+                combinedItem.PropertyChanged += Data_PropertyChanged;
+            }
+        }
 
+        private void DetachDataContext(object dataContext)
+        {
+            if (dataContext is TaskGroup group)
+            {
+                group.PropertyChanged -= Data_PropertyChanged;
+            }
+            else if (dataContext is ApplicationWindow window)
+            {
+                window.PropertyChanged -= Data_PropertyChanged;
+            }
+            else if (dataContext is CombinedTaskbarItem combinedItem)
+            {
+                combinedItem.PropertyChanged -= Data_PropertyChanged;
+            }
+        }
+
+        private void UserControl_Loaded(object sender, RoutedEventArgs e)
+        {
             if (!ListMode)
             {
                 setLabelVisibility();
@@ -144,14 +185,7 @@ namespace CairoDesktop
 
         private void TaskButton_OnUnloaded(object sender, RoutedEventArgs e)
         {
-            if (DataContext is TaskGroup group)
-            {
-                group.PropertyChanged -= Data_PropertyChanged;
-            }
-            else if (DataContext is ApplicationWindow window)
-            {
-                window.PropertyChanged -= Data_PropertyChanged;
-            }
+            DetachDataContext(DataContext);
 
             Settings.Instance.PropertyChanged -= Instance_PropertyChanged;
         }
@@ -192,6 +226,10 @@ namespace CairoDesktop
                         pbProgress.IsIndeterminate = window.ProgressState == NativeMethods.TBPFLAG.TBPF_INDETERMINATE;
                     }
                     break;
+
+                case nameof(CombinedTaskbarItem.TaskGroup) when sender is CombinedTaskbarItem combinedItem:
+                    WindowGroup = combinedItem.TaskGroup?.Windows ?? new ReadOnlyObservableCollection<object>(new ObservableCollection<object>());
+                    break;
             }
         }
 
@@ -208,7 +246,7 @@ namespace CairoDesktop
         {
             if (!ListMode)
             {
-                WinTitle.Visibility = Settings.Instance.ShowTaskbarLabels? Visibility.Visible : Visibility.Collapsed;
+                WinTitle.Visibility = Settings.Instance.ShowTaskbarLabels ? Visibility.Visible : Visibility.Collapsed;
             }
         }
 
